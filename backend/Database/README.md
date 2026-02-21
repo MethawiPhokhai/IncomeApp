@@ -5,10 +5,45 @@ This directory contains SQL scripts to set up the IncomeApp database tables in S
 ## Table Structure
 
 The application uses the following tables:
-1. **financial_summaries** - Stores user financial summary data (income, savings, investments, net worth growth)
-2. **expenses** - Stores user expense/category breakdown data
-3. **insurances** - Stores insurance policy information
-4. **debts** - Stores debt/installment tracking data
+1. **users** - Stores authenticated user profiles (email, name, picture)
+2. **user_providers** - Links users to their OAuth providers (e.g., Facebook)
+3. **financial_summaries** - Stores user financial summary data (income, savings, investments, net worth growth)
+4. **expenses** - Stores user expense/category breakdown data
+5. **insurances** - Stores insurance policy information
+6. **debts** - Stores debt/installment tracking data
+
+## Auth Tables
+
+### Users Table
+
+```sql
+create table public.users (
+  id uuid not null default gen_random_uuid (),
+  email text not null,
+  name text null,
+  picture_url text null,
+  created_at timestamp without time zone not null default now(),
+  updated_at timestamp without time zone not null default now(),
+  constraint users_pkey primary key (id)
+);
+```
+
+### User Providers Table
+
+```sql
+create table public.user_providers (
+  id uuid not null default gen_random_uuid (),
+  user_id uuid not null,
+  provider_name text not null,
+  provider_user_id text not null,
+  provider_email text null,
+  provider_data jsonb null,
+  created_at timestamp without time zone not null default now(),
+  updated_at timestamp without time zone not null default now(),
+  constraint user_providers_pkey primary key (id),
+  constraint user_providers_user_id_fkey foreign key (user_id) references users (id) on delete cascade
+);
+```
 
 ## Setup Steps
 
