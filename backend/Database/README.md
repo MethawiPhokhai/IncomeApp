@@ -1,0 +1,134 @@
+# Database Setup Instructions
+
+This directory contains SQL scripts to set up the IncomeApp database tables in Supabase.
+
+## Table Structure
+
+The application uses the following tables:
+1. **financial_summaries** - Stores user financial summary data (income, savings, investments, net worth growth)
+2. **expenses** - Stores user expense/category breakdown data
+3. **insurances** - Stores insurance policy information
+4. **debts** - Stores debt/installment tracking data
+
+## Setup Steps
+
+### 1. Create Tables
+
+Run the table creation scripts in your Supabase SQL Editor in the following order:
+
+```sql
+-- Run these scripts in order
+00_create_financial_summaries_table.sql  -- Financial summary data
+01_create_expenses_table.sql             -- Expense tracking
+02_create_insurances_table.sql           -- Insurance policies
+03_create_debts_table.sql                -- Debt/installments
+```
+
+These scripts will:
+- Create the necessary tables with proper column types
+- Add indexes for performance
+- Enable Row Level Security (RLS)
+- Create RLS policies to ensure users can only access their own data
+
+### 2. Insert Sample Data
+
+After creating the tables, you can insert sample data using the insert scripts:
+
+> ⚠️ **IMPORTANT**: Replace `'YOUR_USER_ID_HERE'` with your actual user ID from the `auth.users` table.
+
+To find your user ID:
+1. Go to Supabase Dashboard → Authentication → Users
+2. Click on your user
+3. Copy the UUID
+
+Then run the insert scripts:
+
+```sql
+-- Replace YOUR_USER_ID_HERE in each file before running
+insert_expenses.sql
+insert_insurances.sql
+insert_debts.sql
+```
+
+## Table Schemas
+
+### Financial Summaries Table
+
+> [!IMPORTANT]
+> **Row Level Security (RLS) is DISABLED** for this table. We use the Supabase Service Role Key which bypasses RLS, and security is handled via custom JWT authentication in the backend. RLS policies using `auth.uid()` only work with Supabase Auth, not custom JWT authentication.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| user_id | UUID | Reference to the user (unique constraint) |
+| income | DECIMAL(18,2) | User's income |
+| total_savings | DECIMAL(18,2) | Total savings amount |
+| total_investment | DECIMAL(18,2) | Total investment amount |
+| net_worth_growth | DECIMAL(18,2) | Net worth growth |
+| created_at | TIMESTAMP | When the record was created |
+| updated_at | TIMESTAMP | When the record was last updated (auto-updated) |
+
+**Implementation Details:**
+- **Model**: `FinancialSummary.cs` - Uses Postgrest attributes for database mapping
+- **Service**: `FinancialService.cs` - Fetches and updates summary data from database
+- **Default Values**: New users automatically get default summary with all values set to 0
+- **Security**: Security is enforced via JWT authentication at the API level. User ID is extracted from JWT claims and used to filter data queries
+- **Auto-Update**: The `updated_at` field is automatically updated via database trigger
+
+### Expenses Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| user_id | UUID | Foreign key to auth.users |
+| name | TEXT | Expense name (e.g., "เงินเก็บ") |
+| amount | DECIMAL(10,2) | Expense amount |
+| type | TEXT | Type: Fixed, Variable, Family, Health |
+| color | TEXT | Display color in hex |
+| bank_app | TEXT | Bank/app name (Dime, Make, KTB, etc.) |
+| created_at | TIMESTAMP | Creation timestamp |
+| updated_at | TIMESTAMP | Last update timestamp |
+
+### Insurances Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| user_id | UUID | Foreign key to auth.users |
+| provider | TEXT | Insurance provider (e.g., "AIA") |
+| policy_name | TEXT | Policy name (e.g., "แผนชีวิต") |
+| premium | DECIMAL(10,2) | Premium amount |
+| due_date | TIMESTAMP | Payment due date |
+| status | TEXT | Status: Paid, Upcoming, Overdue |
+| created_at | TIMESTAMP | Creation timestamp |
+| updated_at | TIMESTAMP | Last update timestamp |
+
+### Debts Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| user_id | UUID | Foreign key to auth.users |
+| name | TEXT | Debt name (e.g., "Shokz Openrun") |
+| monthly_payment | DECIMAL(10,2) | Monthly installment amount |
+| current_installment | INT | Current installment number |
+| total_installments | INT | Total number of installments |
+| remaining_amount | DECIMAL(10,2) | Remaining balance |
+| total_amount | DECIMAL(10,2) | Total debt amount |
+| created_at | TIMESTAMP | Creation timestamp |
+| updated_at | TIMESTAMP | Last update timestamp |
+
+## Row Level Security (RLS)
+
+All tables have RLS enabled with the following policies:
+- Users can only SELECT, INSERT, UPDATE, and DELETE their own records
+- Access is controlled via `auth.uid() = user_id` check
+
+This ensures data isolation between users.
+
+## Backend Integration
+
+The backend uses the following entity models to interact with these tables:
+- `FinancialSummary.cs` → financial_summaries table
+- `ExpenseEntity.cs` → expenses table
+- `InsuranceEntity.cs` → insurances table  
+- `DebtEntity.cs` → debts table
+
+The `FinancialService.cs` now fetches data from Supabase instead of using in-memory storage.

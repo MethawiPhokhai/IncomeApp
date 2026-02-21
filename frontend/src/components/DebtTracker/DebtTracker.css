@@ -1,0 +1,111 @@
+.debt-tracker {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.btn-add {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.btn-add:hover {
+    background-color: #4f46e5;
+    color: white;
+    border-color: #4f46e5;
+    transform: rotate(90deg);
+}
+
+.debt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.debt-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+
+.debt-content {
+    flex: 1;
+}
+
+.debt-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.debt-payment {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.debt-total {
+    color: #6b7280;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.action-btn:hover {
+    transform: scale(1.2);
+}
+
+.btn-edit:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+}

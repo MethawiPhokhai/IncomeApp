@@ -1,0 +1,166 @@
+.insurance-tracker {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.btn-add {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.btn-add:hover {
+    background-color: #4f46e5;
+    color: white;
+    border-color: #4f46e5;
+    transform: rotate(90deg);
+}
+
+.insurance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.insurance-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 12px;
+    border-left: 4px solid;
+    transition: all 0.2s;
+}
+
+.insurance-item.status-normal {
+    background: #f0fdf4;
+    border-color: #10b981;
+}
+
+.insurance-item.status-warning {
+    background: #fef3c7;
+    border-color: #f59e0b;
+}
+
+.insurance-item.status-urgent {
+    background: #fee2e2;
+    border-color: #ef4444;
+}
+
+.insurance-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.insurance-info {
+    flex: 1;
+}
+
+.insurance-provider {
+    font-weight: 700;
+    color: #1f2937;
+    font-size: 1rem;
+}
+
+.insurance-policy {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.insurance-details {
+    text-align: right;
+}
+
+.insurance-amount {
+    font-weight: 700;
+    color: #4f46e5;
+    font-size: 1.125rem;
+}
+
+.insurance-due {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.due-label {
+    margin-right: 0.25rem;
+}
+
+.due-date {
+    font-weight: 600;
+    color: #374151;
+}
+
+.due-days {
+    color: #6b7280;
+    margin-left: 0.25rem;
+}
+
+.status-urgent .due-days {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.status-warning .due-days {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    line-height: 1;
+}
+
+.action-btn:hover {
+    transform: scale(1.2);
+}
+
+.btn-edit:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+}

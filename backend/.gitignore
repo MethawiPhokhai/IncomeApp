@@ -1,0 +1,32 @@
+# Build output
+bin/
+obj/
+
+# Environment Variables & Secrets
+.env
+.env.*
+
+# App settings with secrets (Production/Development overrides)
+appsettings.Production.json
+appsettings.Development.json
+
+# Runtime logs
+Logs/
+*.log
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+
+# macOS
+.DS_Store
+
+# SSL Certificates
+*.pfx
+*.pem
