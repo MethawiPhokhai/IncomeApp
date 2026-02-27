@@ -28,10 +28,22 @@ export const formatPercent = (num: number, decimals: number = 2): string => {
 };
 
 /**
+ * Helper to normalize date and handle Buddhist Era (BE) years
+ * Some devices/inputs might produce years like 2567 instead of 2024
+ */
+const normalizeDate = (date: string | Date): Date => {
+    const d = typeof date === 'string' ? new Date(date) : new Date(date.getTime());
+    if (d.getFullYear() > 2500) {
+        d.setFullYear(d.getFullYear() - 543);
+    }
+    return d;
+};
+
+/**
  * Format date in Thai locale
  */
 export const formatDate = (date: string | Date): string => {
-    const d = typeof date === 'string' ? new Date(date) : date;
+    const d = normalizeDate(date);
     return new Intl.DateTimeFormat('th-TH', {
         year: 'numeric',
         month: 'short',
@@ -43,7 +55,7 @@ export const formatDate = (date: string | Date): string => {
  * Format short date (day/month)
  */
 export const formatShortDate = (date: string | Date): string => {
-    const d = typeof date === 'string' ? new Date(date) : date;
+    const d = normalizeDate(date);
     return new Intl.DateTimeFormat('th-TH', {
         month: 'short',
         day: 'numeric'
@@ -54,8 +66,13 @@ export const formatShortDate = (date: string | Date): string => {
  * Get days until a date
  */
 export const getDaysUntil = (date: string | Date): number => {
-    const d = typeof date === 'string' ? new Date(date) : date;
+    const d = normalizeDate(date);
     const now = new Date();
+
+    // Reset time part to accurately calculate full days
+    d.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+
     const diff = d.getTime() - now.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return Math.round(diff / (1000 * 60 * 60 * 24));
 };
