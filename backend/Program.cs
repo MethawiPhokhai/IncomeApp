@@ -10,6 +10,10 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Explicitly bind to Railway's dynamically assigned PORT
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // ── Config / Environment Variables ──────────────────────────────────────────
 // From environment variables (.env)
 var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_URL")
@@ -79,7 +83,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Disable HTTPS redirection in production on Railway as it terminates SSL at the edge
+// app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
