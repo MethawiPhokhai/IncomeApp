@@ -115,7 +115,8 @@ const handleFacebookLogin = async () => {
         const accessToken = response.authResponse.accessToken;
         
         try {
-          const apiResponse = await fetch('http://localhost:5098/api/auth/facebook', {
+          const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5098';
+          const apiResponse = await fetch(`${baseUrl}/api/auth/facebook`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
