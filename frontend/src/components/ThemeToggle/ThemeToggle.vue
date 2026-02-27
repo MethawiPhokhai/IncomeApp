@@ -23,24 +23,20 @@ const { theme, toggleTheme } = useTheme();
 
 <style scoped>
 .theme-toggle {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   margin-right: 0.5rem;
+  padding: 0.25rem;
 }
 
 .theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 /* Logic to adjust icon color if background changes in light/dark mode */

@@ -6,7 +6,8 @@
         <h1 class="dashboard-title">Dashboard</h1>
         <div class="header-actions">
           <ThemeToggle />
-          <button @click="handleLogout" class="btn-logout">ออกจากระบบ</button>
+          <button @click="goToAnalytics" class="btn-analytics" title="ภาพรวมทางการเงิน">📊</button>
+          <button @click="handleLogout" class="btn-logout">Sign out</button>
         </div>
       </div>
     </header>
@@ -71,29 +72,7 @@
         </div>
       </section>
 
-      <!-- Section 2: Charts -->
-      <section class="section-charts">
-        <h2 class="section-title">ภาพรวมทางการเงิน</h2>
-        <div class="charts-grid">
-          <!-- APP Expenses Pie Chart -->
-          <div class="chart-card">
-            <h3 class="chart-title">สรุปค่าใช้จ่ายตาม App</h3>
-            <PieChart 
-              :data="savingsVsSpendingData"
-            />
-          </div>
-
-          <!-- Top 5 Expenses Bar Chart -->
-          <div class="chart-card">
-            <h3 class="chart-title">ค่าใช้จ่ายสูงสุด 5 อันดับ</h3>
-            <BarChart 
-              :data="dashboard.charts.topExpenses"
-            />
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 3: App Summary with Subscriptions -->
+      <!-- Section 2: App Summary with Subscriptions -->
       <section class="section-categories">
         <h2 class="section-title">หมวดหมู่ค่าใช้จ่าย</h2>
         
@@ -130,13 +109,11 @@
 // ============================================================================
 // Imports
 // ============================================================================
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { financialService, type DashboardSummary, type UpdateSummaryRequest } from '../../services/financialService';
 import { formatCurrency, formatPercent } from '../../utils/formatters';
 import SummaryCard from '../../components/SummaryCard/SummaryCard.vue';
-import PieChart from '../../components/charts/PieChart/PieChart.vue';
-import BarChart from '../../components/charts/BarChart/BarChart.vue';
 import InsuranceTracker from '../../components/InsuranceTracker/InsuranceTracker.vue';
 import DebtTracker from '../../components/DebtTracker/DebtTracker.vue';
 import AppExpenseSummary from '../../components/AppExpenseSummary/AppExpenseSummary.vue';
@@ -160,12 +137,6 @@ const abortController = ref<AbortController | null>(null);
 // ============================================================================
 // Computed Properties
 // ============================================================================
-const savingsVsSpendingData = computed(() => {
-  if (!dashboard.value) return [];
-  
-  // Use APP-based expense data directly from backend
-  return dashboard.value.charts.expensesByApp;
-});
 
 // ============================================================================
 // Component Functions
@@ -208,6 +179,10 @@ const handleSaveSummary = async (data: UpdateSummaryRequest) => {
 const handleLogout = () => {
   localStorage.removeItem('token');
   router.push('/');
+};
+
+const goToAnalytics = () => {
+  router.push('/analytics');
 };
 
 // ============================================================================
