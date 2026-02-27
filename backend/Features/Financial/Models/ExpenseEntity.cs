@@ -27,6 +27,9 @@ public class ExpenseEntity : BaseModel
     [Column("bank_app")]
     public string BankApp { get; set; } = string.Empty; // "Dime", "Make", "KTB", "Kbank", "Office"
 
+    [Column("is_highlighted")]
+    public bool IsHighlighted { get; set; } = false;
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
 

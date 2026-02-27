@@ -120,6 +120,7 @@ insert_debts.sql
 | type | TEXT | Type: Fixed, Variable, Family, Health |
 | color | TEXT | Display color in hex |
 | bank_app | TEXT | Bank/app name (Dime, Make, KTB, etc.) |
+| is_highlighted | BOOLEAN | Indicates if the expense is highlighted |
 | created_at | TIMESTAMP | Creation timestamp |
 | updated_at | TIMESTAMP | Last update timestamp |
 

@@ -29,11 +29,6 @@ public class FinancialService : IFinancialService
         // Define subscriptions (TODO: Move to Supabase in the future)
         var subscriptions = new List<Subscription>
         {
-            new() { Name = "ค่าประกัน AIA สะสมทรัพย์ 20/8", Amount = 1845m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(20), Remark = "", BankApp = "KTB" },
-            new() { Name = "กรองน้ำ Coway", Amount = 490m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(5), Remark = "", BankApp = "KTB" },
-            new() { Name = "กรองน้ำ Coway บ้าน", Amount = 690m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(8), Remark = "", BankApp = "KTB" },
-            new() { Name = "กรองอากาศ Coway", Amount = 555m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(12), Remark = "", BankApp = "KTB" },
-            new() { Name = "กรองอากาศ Coway บ้าน", Amount = 790m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(15), Remark = "", BankApp = "KTB" },
             new() { Name = "Netflix", Amount = 105m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(7), Remark = "โอนให้ไอเก่งทุกเดือน", BankApp = "Kbank" },
             new() { Name = "Spotify", Amount = 209m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(10), Remark = "", BankApp = "Kbank" },
             new() { Name = "Youtube", Amount = 119m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(14), Remark = "", BankApp = "Kbank" },
@@ -141,6 +136,7 @@ public class FinancialService : IFinancialService
             Type = expense.Type,
             Color = GetAppColor(expense.BankApp),
             BankApp = expense.BankApp,
+            IsHighlighted = expense.IsHighlighted,
             CreatedAt = now,
             UpdatedAt = now
         };
@@ -156,7 +152,8 @@ public class FinancialService : IFinancialService
             Amount = newExpense.Amount,
             Type = newExpense.Type,
             Color = newExpense.Color,
-            BankApp = newExpense.BankApp
+            BankApp = newExpense.BankApp,
+            IsHighlighted = newExpense.IsHighlighted
         };
     }
 
@@ -181,6 +178,7 @@ public class FinancialService : IFinancialService
         existing.Type = expense.Type;
         existing.BankApp = expense.BankApp;
         existing.Color = GetAppColor(expense.BankApp);
+        existing.IsHighlighted = expense.IsHighlighted;
         existing.UpdatedAt = DateTime.UtcNow;
         
         await _supabase
@@ -194,7 +192,8 @@ public class FinancialService : IFinancialService
             Amount = existing.Amount,
             Type = existing.Type,
             Color = existing.Color,
-            BankApp = existing.BankApp
+            BankApp = existing.BankApp,
+            IsHighlighted = existing.IsHighlighted
         };
     }
 
@@ -547,7 +546,8 @@ public class FinancialService : IFinancialService
                 Amount = e.Amount,
                 Type = e.Type,
                 Color = e.Color,
-                BankApp = e.BankApp
+                BankApp = e.BankApp,
+                IsHighlighted = e.IsHighlighted
             })
             .ToList();
     }

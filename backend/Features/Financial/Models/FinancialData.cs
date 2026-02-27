@@ -34,6 +34,7 @@ public class CategoryBreakdown
     public string Type { get; set; } = string.Empty; // "Fixed", "Variable", "Family", "Health"
     public string Color { get; set; } = string.Empty;
     public string BankApp { get; set; } = string.Empty; // "Dime", "Make", "KTB", "Kbank", "Office"
+    public bool IsHighlighted { get; set; }
 }
 
 public class Subscription

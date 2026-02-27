@@ -269,6 +269,7 @@ Four key financial metrics:
 - Expandable cards grouping expenses by app/bank
 - Subscription tracking for recurring payments
 - Itemized breakdown per category
+- **Highlight Feature**: Ability to pin/highlight specific expense items for quick identification (applies a visual indicator)
 
 ### Section 4: Financial Trackers
 - **Insurance Tracker**: Monitor policies and upcoming premium payments
@@ -367,7 +368,8 @@ All endpoints require `Authorization: Bearer {token}` except `/api/auth/facebook
   "amount": 8500,
   "type": "Variable",
   "color": "#FF6384",
-  "bankApp": "Kbank"
+  "bankApp": "Kbank",
+  "isHighlighted": false
 }
 ```
 > `type`: `Fixed` | `Variable` | `Family` | `Health`  

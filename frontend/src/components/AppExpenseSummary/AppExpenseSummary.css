@@ -287,3 +287,32 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Highlight Feature Styles */
+.detail-item.highlighted {
+    background-color: #fef9c3; /* Light yellow background */
+    border-left: 4px solid #eab308; /* Yellow border indicator */
+    padding-left: 8px; /* Offset the padding from the border */
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-right: 12px;
+    border-radius: 4px;
+}
+
+.detail-item.highlighted .item-name {
+    font-weight: 600;
+}
+
+.btn-highlight {
+    color: #9ca3af;
+    font-size: 1rem;
+}
+
+.btn-highlight:hover {
+    background: #fef9c3;
+    color: #eab308;
+}
+
+.btn-highlight.active {
+    color: #eab308;
+}

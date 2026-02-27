@@ -26,7 +26,7 @@
         
         <!-- Expandable Details -->
         <div v-if="expandedApp === 'all' || expandedApp === appData.name" class="app-details">
-          <div v-for="(item, idx) in appData.items" :key="idx" class="detail-item">
+          <div v-for="(item, idx) in appData.items" :key="idx" class="detail-item" :class="{ 'highlighted': item.isHighlighted }">
             <div class="item-content">
               <div>
                 <span class="item-name">{{ item.name }}</span>
@@ -36,6 +36,10 @@
             
             <!-- Actions -->
             <div class="item-actions">
+              <button class="action-btn btn-highlight" :class="{ 'active': item.isHighlighted }" @click.stop="toggleHighlight(item)" title="ไฮไลท์">
+                <span v-if="item.isHighlighted">⭐</span>
+                <span v-else>☆</span>
+              </button>
               <button class="action-btn btn-edit" @click.stop="openEditModal(item)" title="แก้ไข">
                 ✏️
               </button>
@@ -94,12 +98,16 @@
         <div class="app-count">{{ otherCount }} รายการ</div>
         
         <div v-if="expandedApp === 'all' || expandedApp === 'Other'" class="app-details">
-          <div v-for="(item, idx) in otherItems" :key="idx" class="detail-item">
+          <div v-for="(item, idx) in otherItems" :key="idx" class="detail-item" :class="{ 'highlighted': item.isHighlighted }">
             <div class="item-content">
               <span class="item-name">{{ item.name }}</span>
               <span class="item-amount">{{ formatCurrency(item.amount) }}</span>
             </div>
              <div class="item-actions">
+              <button class="action-btn btn-highlight" :class="{ 'active': item.isHighlighted }" @click.stop="toggleHighlight(item)" title="ไฮไลท์">
+                <span v-if="item.isHighlighted">⭐</span>
+                <span v-else>☆</span>
+              </button>
               <button class="action-btn btn-edit" @click.stop="openEditModal(item)" title="แก้ไข">
                 ✏️
               </button>
@@ -252,6 +260,19 @@ const handleSave = async (item: CategoryBreakdown) => {
   } catch (error) {
     console.error('Failed to save expense:', error);
     alert('บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+  }
+};
+
+const toggleHighlight = async (item: CategoryBreakdown) => {
+  try {
+    const updatedItem = { ...item, isHighlighted: !item.isHighlighted };
+    if (updatedItem.id) {
+      await financialService.updateExpense(updatedItem.id, updatedItem);
+      emit('refresh');
+    }
+  } catch (error) {
+    console.error('Failed to toggle highlight:', error);
+    alert('อัปเดตสถานะไฮไลท์ไม่สำเร็จ');
   }
 };
 

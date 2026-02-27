@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS expenses (
     type TEXT NOT NULL CHECK (type IN ('Fixed', 'Variable', 'Family', 'Health')),
     color TEXT NOT NULL,
     bank_app TEXT NOT NULL,
+    is_highlighted BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

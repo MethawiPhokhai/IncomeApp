@@ -24,6 +24,7 @@ export interface CategoryBreakdown {
     type: string;
     color: string;
     bankApp: string;
+    isHighlighted?: boolean;
 }
 
 export interface Subscription {
