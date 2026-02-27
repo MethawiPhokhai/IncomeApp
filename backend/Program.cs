@@ -20,7 +20,10 @@ var supabaseKey = Environment.GetEnvironmentVariable("SUPABASE_SERVICE_KEY")
 // From appsettings.json
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super_secret_key_for_development_purpose_only_very_long_string";
 var backendUrl = builder.Configuration["Cors:BackendUrl"] ?? "http://localhost:5098";
-var frontendUrl = builder.Configuration["Cors:FrontendUrl"] ?? "http://localhost:5173";
+var frontendUrls = (builder.Configuration["Cors:FrontendUrl"] ?? "http://localhost:5173")
+    .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+    .Select(url => url.Trim().TrimEnd('/'))
+    .ToArray();
 // ────────────────────────────────────────────────────────────────────────────
 
 // Configure Supabase
@@ -48,7 +51,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = backendUrl,
-            ValidAudience = frontendUrl,
+            ValidAudiences = frontendUrls,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
@@ -60,7 +63,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(frontendUrl)
+        policy.WithOrigins(frontendUrls)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
