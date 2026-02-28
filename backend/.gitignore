@@ -7,7 +7,6 @@ obj/
 .env.*
 
 # App settings with secrets (Production/Development overrides)
-appsettings.Production.json
 appsettings.Development.json
 
 # Runtime logs
