@@ -5,8 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Supabase;
 
-// Load .env file
-DotNetEnv.Env.Load();
+// // Load .env file
+// Using env from railway instead of this
+// DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
