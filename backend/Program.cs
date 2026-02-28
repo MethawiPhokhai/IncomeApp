@@ -11,7 +11,8 @@ DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Explicitly bind to Railway's dynamically assigned PORT
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+var portEnv = Environment.GetEnvironmentVariable("PORT");
+var port = string.IsNullOrWhiteSpace(portEnv) ? "8080" : portEnv;
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // ── Config / Environment Variables ──────────────────────────────────────────
