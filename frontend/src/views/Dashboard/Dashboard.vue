@@ -109,45 +109,42 @@
 // ============================================================================
 // Imports
 // ============================================================================
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { type DashboardSummary, type UpdateSummaryRequest } from '../../services/financialService';
-import { formatCurrency, formatPercent } from '../../utils/formatters';
-import { useApi, useApiMutation } from '../../composables/useCrud';
-import SummaryCard from '../../components/SummaryCard/SummaryCard.vue';
-import InsuranceTracker from '../../components/InsuranceTracker/InsuranceTracker.vue';
-import DebtTracker from '../../components/DebtTracker/DebtTracker.vue';
-import AppExpenseSummary from '../../components/AppExpenseSummary/AppExpenseSummary.vue';
-import SummaryEditModal from '../../components/SummaryEditModal/SummaryEditModal.vue';
-import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue';
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { type DashboardSummary, type UpdateSummaryRequest } from '../../services/financialService'
+import { formatCurrency, formatPercent } from '../../utils/formatters'
+import { useApi, useApiMutation } from '../../composables/useCrud'
+
+// Components
+import SummaryCard from '../../components/SummaryCard/SummaryCard.vue'
+import InsuranceTracker from '../../components/InsuranceTracker/InsuranceTracker.vue'
+import DebtTracker from '../../components/DebtTracker/DebtTracker.vue'
+import AppExpenseSummary from '../../components/AppExpenseSummary/AppExpenseSummary.vue'
+import SummaryEditModal from '../../components/SummaryEditModal/SummaryEditModal.vue'
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue'
 
 // ============================================================================
 // Composables
 // ============================================================================
-const router = useRouter();
+const router = useRouter()
 
 // ============================================================================
 // Query & Mutation
 // ============================================================================
-const { data: dashboard, isLoading: loading, error, refetch } = useApi<DashboardSummary>('/api/financial/dashboard')
+const { data: dashboard, isLoading: loading, error, refetch } = useApi<DashboardSummary>(
+  '/api/financial/dashboard'
+)
 
 const updateSummaryMutation = useApiMutation<DashboardSummary, UpdateSummaryRequest>(
-  'post', 
+  'post',
   '/api/financial/summary',
   { invalidateKeys: [['dashboard']] }
 )
 
-onMounted(() => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    router.push('/');
-  }
-});
-
 // ============================================================================
 // Reactive State
 // ============================================================================
-const showSummaryModal = ref(false);
+const showSummaryModal = ref(false)
 
 // ============================================================================
 // Computed Properties
@@ -161,20 +158,26 @@ const loadDashboard = () => refetch()
 const handleSaveSummary = async (data: UpdateSummaryRequest) => {
   await updateSummaryMutation.mutateAsync(data)
   showSummaryModal.value = false
-};
+}
 
 const handleLogout = () => {
-  localStorage.removeItem('token');
-  router.push('/');
-};
+  localStorage.removeItem('token')
+  router.push('/')
+}
 
 const goToAnalytics = () => {
-  router.push('/analytics');
-};
+  router.push('/analytics')
+}
 
 // ============================================================================
 // Lifecycle Hooks
 // ============================================================================
+onMounted(() => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    router.push('/')
+  }
+})
 </script>
 
 <style scoped src="./Dashboard.css"></style>

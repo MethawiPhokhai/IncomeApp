@@ -45,33 +45,55 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { type DashboardSummary } from '../../services/financialService';
-import { useApi } from '../../composables/useCrud';
-import PieChart from '../../components/charts/PieChart/PieChart.vue';
-import BarChart from '../../components/charts/BarChart/BarChart.vue';
-import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue';
+// ============================================================================
+// Imports
+// ============================================================================
+import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { type DashboardSummary } from '../../services/financialService'
+import { useApi } from '../../composables/useCrud'
 
-const router = useRouter();
+// Components
+import PieChart from '../../components/charts/PieChart/PieChart.vue'
+import BarChart from '../../components/charts/BarChart/BarChart.vue'
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue'
 
-const { data: dashboard, isLoading: loading, error, refetch } = useApi<DashboardSummary>('/api/financial/dashboard')
+// ============================================================================
+// Composables
+// ============================================================================
+const router = useRouter()
 
+// ============================================================================
+// Query
+// ============================================================================
+const { data: dashboard, isLoading: loading, error, refetch } = useApi<DashboardSummary>(
+  '/api/financial/dashboard'
+)
+
+// ============================================================================
+// Computed Properties
+// ============================================================================
 const savingsVsSpendingData = computed(() => {
-  if (!dashboard.value) return [];
-  return dashboard.value.charts.expensesByApp;
-});
+  if (!dashboard.value) return []
+  return dashboard.value.charts.expensesByApp
+})
 
+// ============================================================================
+// Component Functions
+// ============================================================================
 const goBack = () => {
-  router.push('/dashboard');
-};
+  router.push('/dashboard')
+}
 
+// ============================================================================
+// Lifecycle Hooks
+// ============================================================================
 onMounted(() => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token')
   if (!token) {
-    router.push('/');
+    router.push('/')
   }
-});
+})
 </script>
 
 <style scoped src="./Analytics.css"></style>
