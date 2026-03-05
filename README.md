@@ -8,6 +8,7 @@ A modern full-stack personal finance tracker built with Vue.js and .NET 10, usin
 - Vue.js 3.x + TypeScript
 - Vite 7.x
 - Vue Router 4.x
+- TanStack Query (Vue Query) for server state management
 - Chart.js (via vue-chartjs)
 - CSS Custom Properties
 
@@ -67,7 +68,8 @@ IncomeApp/
 │   │   │       ├── GaugeChart/
 │   │   │       └── PieChart/
 │   │   ├── composables/
-│   │   │   └── useTheme.ts             # Theme management composable
+│   │   │   ├── useTheme.ts             # Theme management composable
+│   │   │   └── useCrud.ts              # TanStack Query composables for CRUD
 │   │   ├── router/
 │   │   │   └── index.ts                # Vue Router configuration
 │   │   ├── services/                   # API service layer
@@ -302,6 +304,46 @@ graph LR
 - ✅ Prevents memory leaks on component unmount
 - ✅ Cancels redundant requests when new ones start
 - ✅ Frees server CPU and network bandwidth immediately
+
+
+---
+
+## ⚡ TanStack Query (Vue Query)
+
+All API calls use TanStack Query for efficient server state management.
+
+### Composables
+
+```typescript
+// src/composables/useCrud.ts
+
+// GET request with automatic caching
+const { data, isLoading, error, refetch } = useApi<T>('/api/endpoint')
+
+// POST/PUT/DELETE with automatic cache invalidation
+const createMutation = useApiMutation<TData, TVariables>('post', '/api/endpoint')
+createMutation.mutate({ ... })
+```
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| **Caching** | API responses are cached (default: 5 min staleTime) |
+| **Auto Refetch** | Automatically refetches when returning to a page |
+| **Deduplication** | Multiple components requesting same API = single request |
+| **Optimistic Updates** | UI updates immediately, then syncs with server |
+| **Loading/Error States** | Built-in states via `isLoading`, `isError`, `error` |
+
+### Example: Dashboard & Analytics
+
+Both pages use the same `/api/financial/dashboard` endpoint with the same cache key. When navigating between them:
+
+1. First visit: API call → cache stored
+2. Return visit: Instant data from cache (no API call)
+3. Background refetch: Updates cache if data changed
+
+This eliminates redundant API calls and provides a smoother user experience.
 
 
 ---
