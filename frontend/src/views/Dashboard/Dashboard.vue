@@ -20,8 +20,8 @@
 
     <!-- Error State -->
     <div v-else-if="error" class="error-container">
-      <p class="error-message">{{ error }}</p>
-      <button @click="loadDashboard" class="btn-retry">ลองอีกครั้ง</button>
+      <p class="error-message">{{ (error as Error).message }}</p>
+      <button @click="() => refetch()" class="btn-retry">ลองอีกครั้ง</button>
     </div>
 
     <!-- Dashboard Content -->
@@ -109,10 +109,11 @@
 // ============================================================================
 // Imports
 // ============================================================================
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { financialService, type DashboardSummary, type UpdateSummaryRequest } from '../../services/financialService';
+import { type DashboardSummary, type UpdateSummaryRequest } from '../../services/financialService';
 import { formatCurrency, formatPercent } from '../../utils/formatters';
+import { useApi, useApiMutation } from '../../composables/useCrud';
 import SummaryCard from '../../components/SummaryCard/SummaryCard.vue';
 import InsuranceTracker from '../../components/InsuranceTracker/InsuranceTracker.vue';
 import DebtTracker from '../../components/DebtTracker/DebtTracker.vue';
@@ -126,13 +127,27 @@ import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue';
 const router = useRouter();
 
 // ============================================================================
+// Query & Mutation
+// ============================================================================
+const { data: dashboard, isLoading: loading, error, refetch } = useApi<DashboardSummary>('/api/financial/dashboard')
+
+const updateSummaryMutation = useApiMutation<DashboardSummary, UpdateSummaryRequest>(
+  'post', 
+  '/api/financial/summary',
+  { invalidateKeys: [['dashboard']] }
+)
+
+onMounted(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    router.push('/');
+  }
+});
+
+// ============================================================================
 // Reactive State
 // ============================================================================
-const dashboard = ref<DashboardSummary | null>(null);
-const loading = ref(true);
-const error = ref('');
 const showSummaryModal = ref(false);
-const abortController = ref<AbortController | null>(null);
 
 // ============================================================================
 // Computed Properties
@@ -141,39 +156,11 @@ const abortController = ref<AbortController | null>(null);
 // ============================================================================
 // Component Functions
 // ============================================================================
-const loadDashboard = async () => {
-  // Cancel previous request if still pending
-  if (abortController.value) {
-    abortController.value.abort();
-  }
-
-  loading.value = true;
-  error.value = '';
-  abortController.value = new AbortController();
-  
-  try {
-    dashboard.value = await financialService.getDashboard(abortController.value.signal);
-  } catch (err: any) {
-    // Don't show error if request was aborted
-    if (err.name === 'AbortError') {
-      console.log('Request cancelled');
-      return;
-    }
-    error.value = 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง';
-    console.error('Dashboard load error:', err);
-  } finally {
-    loading.value = false;
-  }
-};
+const loadDashboard = () => refetch()
 
 const handleSaveSummary = async (data: UpdateSummaryRequest) => {
-  try {
-    const updated = await financialService.updateSummary(data);
-    dashboard.value = updated;
-  } catch (err) {
-    console.error('Failed to update summary:', err);
-    alert('บันทึกข้อมูลไม่สำเร็จ');
-  }
+  await updateSummaryMutation.mutateAsync(data)
+  showSummaryModal.value = false
 };
 
 const handleLogout = () => {
@@ -188,23 +175,6 @@ const goToAnalytics = () => {
 // ============================================================================
 // Lifecycle Hooks
 // ============================================================================
-onMounted(() => {
-  // Check if user is authenticated
-  const token = localStorage.getItem('token');
-  if (!token) {
-    router.push('/');
-    return;
-  }
-  
-  loadDashboard();
-});
-
-onBeforeUnmount(() => {
-  // Cancel any pending requests when component unmounts
-  if (abortController.value) {
-    abortController.value.abort();
-  }
-});
 </script>
 
 <style scoped src="./Dashboard.css"></style>

@@ -19,8 +19,8 @@
 
     <!-- Error State -->
     <div v-else-if="error" class="error-container">
-      <p class="error-message">{{ error }}</p>
-      <button @click="loadDashboard" class="btn-retry">ลองอีกครั้ง</button>
+      <p class="error-message">{{ (error as Error).message }}</p>
+      <button @click="() => refetch()" class="btn-retry">ลองอีกครั้ง</button>
     </div>
 
     <!-- Analytics Content -->
@@ -45,45 +45,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { financialService, type DashboardSummary } from '../../services/financialService';
+import { type DashboardSummary } from '../../services/financialService';
+import { useApi } from '../../composables/useCrud';
 import PieChart from '../../components/charts/PieChart/PieChart.vue';
 import BarChart from '../../components/charts/BarChart/BarChart.vue';
 import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue';
 
 const router = useRouter();
 
-const dashboard = ref<DashboardSummary | null>(null);
-const loading = ref(true);
-const error = ref('');
-const abortController = ref<AbortController | null>(null);
+const { data: dashboard, isLoading: loading, error, refetch } = useApi<DashboardSummary>('/api/financial/dashboard')
 
 const savingsVsSpendingData = computed(() => {
   if (!dashboard.value) return [];
-  // Use APP-based expense data directly from backend
   return dashboard.value.charts.expensesByApp;
 });
-
-const loadDashboard = async () => {
-  if (abortController.value) {
-    abortController.value.abort();
-  }
-
-  loading.value = true;
-  error.value = '';
-  abortController.value = new AbortController();
-  
-  try {
-    dashboard.value = await financialService.getDashboard(abortController.value.signal);
-  } catch (err: any) {
-    if (err.name === 'AbortError') return;
-    error.value = 'ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง';
-    console.error('Data load error:', err);
-  } finally {
-    loading.value = false;
-  }
-};
 
 const goBack = () => {
   router.push('/dashboard');
@@ -93,14 +70,6 @@ onMounted(() => {
   const token = localStorage.getItem('token');
   if (!token) {
     router.push('/');
-    return;
-  }
-  loadDashboard();
-});
-
-onBeforeUnmount(() => {
-  if (abortController.value) {
-    abortController.value.abort();
   }
 });
 </script>

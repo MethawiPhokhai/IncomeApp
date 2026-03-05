@@ -1,6 +1,43 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { apiClient } from '../services/apiClient'
 
+export function useApi<T>(endpoint: string, options?: {
+  key?: string[]
+  staleTime?: number
+  enabled?: boolean
+}) {
+  return useQuery({
+    queryKey: options?.key || [endpoint],
+    queryFn: () => apiClient.get<T>(endpoint),
+    staleTime: options?.staleTime ?? 1000 * 60 * 5,
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export function useApiMutation<TData, TVariables>(
+  method: 'post' | 'put' | 'delete',
+  endpoint: string,
+  options?: { invalidateKeys?: string[][] }
+) {
+  const queryClient = useQueryClient()
+  
+  return useMutation<TData, Error, TVariables>({
+    mutationFn: (variables) => {
+      if (method === 'post') return apiClient.post<TData>(endpoint, variables as any)
+      if (method === 'put') {
+        const { id, ...data } = variables as { id: string } & TData
+        return apiClient.put<TData>(`${endpoint}/${id}`, data as any)
+      }
+      return apiClient.delete(`${endpoint}/${variables}`) as any
+    },
+    onSuccess: () => {
+      options?.invalidateKeys?.forEach(key => 
+        queryClient.invalidateQueries({ queryKey: key })
+      )
+    },
+  })
+}
+
 export function useCrud<T>(resource: string) {
   const queryClient = useQueryClient()
   const keys = {
