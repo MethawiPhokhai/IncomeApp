@@ -32,7 +32,7 @@ public class FinancialService : IFinancialService
             new() { Name = "Netflix", Amount = 105m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(7), Remark = "โอนให้ไอเก่งทุกเดือน", BankApp = "Kbank" },
             new() { Name = "Spotify", Amount = 209m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(10), Remark = "", BankApp = "Kbank" },
             new() { Name = "Youtube", Amount = 119m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(14), Remark = "", BankApp = "Kbank" },
-            new() { Name = "Google One", Amount = 750m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(20), Remark = "", BankApp = "KTB" },
+            new() { Name = "Google Drive", Amount = 70m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(20), Remark = "", BankApp = "KTB" },
         };
         
         // Calculate chart data using the fetched expenses
