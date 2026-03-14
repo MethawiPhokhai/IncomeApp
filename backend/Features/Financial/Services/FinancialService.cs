@@ -1,4 +1,5 @@
 using IncomeApp.Features.Financial.Models;
+using Microsoft.Extensions.Logging;
 using Supabase;
 
 namespace IncomeApp.Features.Financial.Services;
@@ -6,10 +7,12 @@ namespace IncomeApp.Features.Financial.Services;
 public class FinancialService : IFinancialService
 {
     private readonly Client _supabase;
+    private readonly ILogger<FinancialService> _logger;
 
-    public FinancialService(Client supabase)
+    public FinancialService(Client supabase, ILogger<FinancialService> logger)
     {
         _supabase = supabase;
+        _logger = logger;
     }
 
     // No more in-memory storage - all data is now fetched from Supabase
@@ -494,17 +497,19 @@ public class FinancialService : IFinancialService
                 .From<FinancialSummary>()
                 .Where(s => s.UserId == userGuid)
                 .Single();
-            
+
             if (existingSummary != null)
             {
                 return existingSummary;
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Summary doesn't exist, will create default one
+            // Summary doesn't exist yet — this is normal for first-time users
+            _logger.LogDebug(ex, "No financial summary found for UserId={UserId}, creating default", userId);
         }
-        
+
+        _logger.LogInformation("Creating default financial summary for UserId={UserId}", userId);
         // Create default summary with initial values
         var now = DateTime.UtcNow;
         var defaultSummary = new FinancialSummary

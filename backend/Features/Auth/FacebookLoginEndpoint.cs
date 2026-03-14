@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using backend.Features.Auth.Services;
 
@@ -43,6 +44,9 @@ public class FacebookPicture
     public string? Url { get; set; }
 }
 
+// Marker class for ILogger category (static classes cannot be used as type arguments)
+internal sealed class FacebookLoginLog { }
+
 public static class FacebookLoginEndpoint
 {
     private static readonly HttpClient HttpClient = new();
@@ -50,12 +54,14 @@ public static class FacebookLoginEndpoint
     public static void MapFacebookLoginEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/auth/facebook", async (
-            FacebookLoginRequest request, 
+            FacebookLoginRequest request,
             IConfiguration configuration,
-            IFacebookLoginService supabaseService) =>
+            IFacebookLoginService supabaseService,
+            ILogger<FacebookLoginLog> logger) =>
         {
             if (string.IsNullOrWhiteSpace(request.AccessToken))
             {
+                logger.LogWarning("Facebook login attempted with empty access token");
                 return Results.BadRequest(new AuthResponse(false, "Access token is required"));
             }
 
@@ -67,6 +73,7 @@ public static class FacebookLoginEndpoint
 
                 if (!fbResponse.IsSuccessStatusCode)
                 {
+                    logger.LogWarning("Facebook Graph API rejected token. StatusCode={StatusCode}", (int)fbResponse.StatusCode);
                     return Results.BadRequest(new AuthResponse(false, "Invalid Facebook Token"));
                 }
 
@@ -75,6 +82,7 @@ public static class FacebookLoginEndpoint
 
                 if (fbUser == null || string.IsNullOrEmpty(fbUser.Id))
                 {
+                    logger.LogWarning("Facebook Graph API returned empty user data");
                     return Results.BadRequest(new AuthResponse(false, "Could not retrieve user data from Facebook"));
                 }
 
@@ -82,14 +90,14 @@ public static class FacebookLoginEndpoint
                 var existingUser = await supabaseService.FindUserByProviderAsync("facebook", fbUser.Id);
 
                 Models.User dbUser;
+                bool isNewUser;
                 if (existingUser != null)
                 {
-                    // User already exists
                     dbUser = existingUser;
+                    isNewUser = false;
                 }
                 else
                 {
-                    // Create new user
                     var newUser = new Models.User
                     {
                         Email = fbUser.Email ?? $"fb_{fbUser.Id}@placeholder.com",
@@ -110,6 +118,7 @@ public static class FacebookLoginEndpoint
                     };
 
                     dbUser = await supabaseService.CreateUserWithProviderAsync(newUser, newProvider);
+                    isNewUser = true;
                 }
 
                 // 3. Generate JWT
@@ -137,6 +146,8 @@ public static class FacebookLoginEndpoint
 
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
+                logger.LogInformation("Facebook login succeeded. UserId={UserId}, IsNewUser={IsNewUser}", dbUser.Id, isNewUser);
+
                 // 4. Return response with user data from database
                 var userDto = new UserDto(
                     Id: dbUser.Id.ToString(),
@@ -154,7 +165,8 @@ public static class FacebookLoginEndpoint
             }
             catch (Exception ex)
             {
-                return Results.Problem($"Authentication failed: {ex.Message}");
+                logger.LogError(ex, "Facebook authentication pipeline failed");
+                return Results.Problem("Authentication failed");
             }
         })
         .WithName("FacebookLogin")
