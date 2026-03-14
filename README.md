@@ -17,6 +17,7 @@ A modern full-stack personal finance tracker built with Vue.js and .NET 10, usin
 - Supabase (PostgreSQL)
 - Swagger / OpenAPI
 - CORS Middleware
+- Serilog (Structured Logging)
 
 ---
 
@@ -345,6 +346,58 @@ Both pages use the same `/api/financial/dashboard` endpoint with the same cache 
 
 This eliminates redundant API calls and provides a smoother user experience.
 
+
+---
+
+## 🪵 Structured Logging (Serilog)
+
+The backend uses **Serilog** for structured JSON logging, designed for future observability and log-based analysis.
+
+### Output Format
+
+| Environment | Format | Sink |
+|---|---|---|
+| Development | Colored text (human-readable) | Console |
+| Production | CLEF (Compact JSON per line) | stdout → Railway |
+
+**Example — Production log line:**
+```json
+{"@t":"2026-03-14T10:22:01Z","@mt":"HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms","RequestMethod":"POST","RequestPath":"/api/auth/facebook","StatusCode":200,"Elapsed":312.4,"UserId":"550e8400-e29b-41d4-a716-446655440000","Application":"IncomeApp","EnvironmentName":"Production"}
+```
+
+### Enriched Fields (every log event)
+
+| Field | Source |
+|---|---|
+| `Application` | Static: `"IncomeApp"` |
+| `EnvironmentName` | `ASPNETCORE_ENVIRONMENT` |
+| `MachineName` | Host machine name |
+| `ThreadId` | Async thread context |
+| `UserId` | JWT `sub` claim (when authenticated) |
+| `RequestHost` / `RequestScheme` | HTTP request context |
+
+### What Gets Logged
+
+| Event | Level | Fields |
+|---|---|---|
+| HTTP request/response | `Information` | Method, Path, StatusCode, ElapsedMs, UserId |
+| Facebook login success | `Information` | UserId, IsNewUser |
+| New user registration | `Information` | UserId, ProviderName |
+| Facebook token rejected | `Warning` | StatusCode |
+| CRUD success (expense/insurance/debt) | `Information` | EntityId, UserId |
+| Database errors | `Error` | Full exception, UserId |
+| App startup / crash | `Information` / `Fatal` | — |
+
+### Log Levels by Environment
+
+- **Development**: `Information` for app code, `Warning` for Microsoft internals
+- **Production**: `Warning` for all framework internals, `Information` for `IncomeApp.*` namespace only
+
+### Future Observability
+
+- **Seq** (local dashboard): Add `Serilog.Sinks.Seq` + `WriteTo.Seq("http://localhost:5341")` in `appsettings.Development.json`
+- **OpenTelemetry**: Add `Serilog.Enrichers.Span` → `TraceId`/`SpanId` appear automatically in every log event
+- **Grafana Loki / Datadog**: CLEF JSON is ingested directly with no format changes needed
 
 ---
 
