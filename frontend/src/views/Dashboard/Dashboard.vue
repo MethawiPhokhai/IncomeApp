@@ -1,17 +1,5 @@
 <template>
   <div class="dashboard">
-    <!-- Header -->
-    <header class="dashboard-header">
-      <div class="header-content">
-        <h1 class="dashboard-title">Dashboard</h1>
-        <div class="header-actions">
-          <ThemeToggle />
-          <button @click="goToAnalytics" class="btn-analytics" title="ภาพรวมทางการเงิน">📊</button>
-          <button @click="handleLogout" class="btn-logout">Sign out</button>
-        </div>
-      </div>
-    </header>
-
     <!-- Loading State -->
     <div v-if="loading" class="loading-container">
       <div class="spinner"></div>
@@ -28,13 +16,14 @@
     <div v-else-if="dashboard" class="dashboard-content">
       <!-- Section 1: The Big Numbers - Money Flow -->
       <section class="section-summary">
-        <div class="summary-header" style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem;">
-           <button class="btn-edit-summary" @click="showSummaryModal = true" style="background: none; border: none; cursor: pointer; color: #6b7280; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background-color 0.2s;">
-             ✏️
-           </button>
+        <div class="summary-header">
+          <h2 class="section-title">Portfolio Overview</h2>
+          <button class="btn-edit-summary" @click="showSummaryModal = true" title="Edit summary">
+            ✏️
+          </button>
         </div>
         <div class="summary-grid">
-          <SummaryCard 
+          <SummaryCard
             label="รายได้"
             :value="formatCurrency(dashboard.income)"
             variant="info"
@@ -42,7 +31,7 @@
             <template #icon>💰</template>
           </SummaryCard>
 
-          <SummaryCard 
+          <SummaryCard
             label="ค่าใช้จ่าย"
             :value="formatCurrency(dashboard.totalExpenses)"
             :subtitle="`${((dashboard.totalExpenses / dashboard.income) * 100).toFixed(1)}% ของรายได้`"
@@ -51,7 +40,7 @@
             <template #icon>💸</template>
           </SummaryCard>
 
-          <SummaryCard 
+          <SummaryCard
             label="เงินออม + ลงทุน"
             :value="formatCurrency(dashboard.totalSavings + dashboard.totalInvestment)"
             :subtitle="`${(((dashboard.totalSavings + dashboard.totalInvestment) / dashboard.income) * 100).toFixed(1)}% ของรายได้`"
@@ -60,7 +49,7 @@
             <template #icon>🎯</template>
           </SummaryCard>
 
-          <SummaryCard 
+          <SummaryCard
             label="Net Worth Growth"
             :value="formatCurrency(dashboard.netWorthGrowth)"
             :subtitle="`+${formatPercent(dashboard.netWorthGrowthPercent)} จากเดือนที่แล้ว`"
@@ -75,10 +64,10 @@
       <!-- Section 2: App Summary with Subscriptions -->
       <section class="section-categories">
         <h2 class="section-title">หมวดหมู่ค่าใช้จ่าย</h2>
-        
+
         <div class="app-summary-full">
-          <AppExpenseSummary 
-            :categories="dashboard.categories" 
+          <AppExpenseSummary
+            :categories="dashboard.categories"
             :subscriptions="dashboard.subscriptions"
             @refresh="loadDashboard"
           />
@@ -93,12 +82,12 @@
           <DebtTracker :debts="dashboard.debts" @refresh="loadDashboard" />
         </div>
       </section>
-      
+
       <!-- Modals -->
-      <SummaryEditModal 
-        :is-open="showSummaryModal" 
-        :current-data="dashboard" 
-        @close="showSummaryModal = false" 
+      <SummaryEditModal
+        :is-open="showSummaryModal"
+        :current-data="dashboard"
+        @close="showSummaryModal = false"
         @save="handleSaveSummary"
       />
     </div>
@@ -121,7 +110,6 @@ import InsuranceTracker from '../../components/InsuranceTracker/InsuranceTracker
 import DebtTracker from '../../components/DebtTracker/DebtTracker.vue'
 import AppExpenseSummary from '../../components/AppExpenseSummary/AppExpenseSummary.vue'
 import SummaryEditModal from '../../components/SummaryEditModal/SummaryEditModal.vue'
-import ThemeToggle from '../../components/ThemeToggle/ThemeToggle.vue'
 
 // ============================================================================
 // Composables
@@ -147,10 +135,6 @@ const updateSummaryMutation = useApiMutation<DashboardSummary, UpdateSummaryRequ
 const showSummaryModal = ref(false)
 
 // ============================================================================
-// Computed Properties
-// ============================================================================
-
-// ============================================================================
 // Component Functions
 // ============================================================================
 const loadDashboard = () => refetch()
@@ -158,15 +142,6 @@ const loadDashboard = () => refetch()
 const handleSaveSummary = async (data: UpdateSummaryRequest) => {
   await updateSummaryMutation.mutateAsync(data)
   showSummaryModal.value = false
-}
-
-const handleLogout = () => {
-  localStorage.removeItem('token')
-  router.push('/')
-}
-
-const goToAnalytics = () => {
-  router.push('/analytics')
 }
 
 // ============================================================================

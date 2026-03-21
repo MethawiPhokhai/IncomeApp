@@ -36,6 +36,7 @@ public class FinancialService : IFinancialService
             new() { Name = "Spotify", Amount = 209m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(10), Remark = "", BankApp = "Kbank" },
             new() { Name = "Youtube", Amount = 119m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(14), Remark = "", BankApp = "Kbank" },
             new() { Name = "Google Drive", Amount = 70m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(20), Remark = "", BankApp = "KTB" },
+            new() { Name = "Claude", Amount = 799m, BillingCycle = "Monthly", NextBillingDate = DateTime.Now.AddDays(25), Remark = "", BankApp = "KTB" },
         };
         
         // Calculate chart data using the fetched expenses
