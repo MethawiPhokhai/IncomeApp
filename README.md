@@ -51,18 +51,18 @@ IncomeApp/
 ├── frontend/                           # Vue.js + Vite Frontend
 │   ├── src/
 │   │   ├── components/                 # Reusable Vue components
-│   │   │   ├── AppLayout/              # Shared layout: fixed sidebar + sticky top header
-│   │   │   ├── AppExpenseSummary/      # Expense summary with expandable cards
+│   │   │   ├── AppLayout/              # Shared layout: fixed sidebar + sticky top header (dark mode aware)
+│   │   │   ├── AppExpenseSummary/      # Expense list+panel layout; category rows + detail panel
 │   │   │   ├── CategoryBreakdown/      # Category display component
-│   │   │   ├── DebtModal/              # Modal for debt CRUD
-│   │   │   ├── DebtTracker/            # Debt tracking component
-│   │   │   ├── ExpenseModal/           # Modal for expense CRUD
-│   │   │   ├── InsuranceModal/         # Modal for insurance CRUD
-│   │   │   ├── InsuranceTracker/       # Insurance tracking component
-│   │   │   ├── ProgressBar/            # Progress bar component
+│   │   │   ├── DebtModal/              # Modal for debt CRUD (business style, dark mode)
+│   │   │   ├── DebtTracker/            # "Recurring Payment" — installment progress bars
+│   │   │   ├── ExpenseModal/           # Modal for expense CRUD (business style, dark mode)
+│   │   │   ├── InsuranceModal/         # Modal for insurance CRUD (business style, dark mode)
+│   │   │   ├── InsuranceTracker/       # "Incoming Payment" — timeline sorted by due date
+│   │   │   ├── ProgressBar/            # Reusable progress bar with named actions slot
 │   │   │   ├── SubscriptionTracker/    # Subscription tracking component
-│   │   │   ├── SummaryCard/            # Summary card for dashboard
-│   │   │   ├── SummaryEditModal/       # Modal for editing summary stats
+│   │   │   ├── SummaryCard/            # Summary card (primary/success/warning/info variants)
+│   │   │   ├── SummaryEditModal/       # Modal for editing summary stats (business style, dark mode)
 │   │   │   └── ThemeToggle/            # Dark/light theme toggle (Material Symbols icons)
 │   │   ├── composables/
 │   │   │   ├── useTheme.ts             # Theme management composable
@@ -79,8 +79,11 @@ IncomeApp/
 │   │   │   │   ├── Analytics.vue       # Bento-grid analytics page (SVG donut, subscriptions table)
 │   │   │   │   └── Analytics.css
 │   │   │   ├── Dashboard/
-│   │   │   │   ├── Dashboard.vue
+│   │   │   │   ├── Dashboard.vue       # Hero summary card + expense category list+panel layout
 │   │   │   │   └── Dashboard.css
+│   │   │   ├── Trackers/
+│   │   │   │   ├── Trackers.vue        # Insurance timeline + debt installment trackers
+│   │   │   │   └── Trackers.css
 │   │   │   └── Login/
 │   │   │       ├── Login.vue
 │   │   │       └── Login.css
@@ -249,29 +252,61 @@ sequenceDiagram
 
 ---
 
+## 🎨 Design System
+
+All UI uses a unified **Financial Architect** design language:
+
+- **Primary color**: Navy `#1A237E` (light) / Indigo `#818CF8` (dark) via `--color-primary`
+- **Typography**: Inter font throughout — `font-weight: 800` for values, uppercase micro-labels (`0.6875rem`, `letter-spacing: 0.08em`) for section titles
+- **Icons**: Material Symbols Outlined (same weight/size conventions as the sidebar nav icons)
+- **Dark mode**: All colors use CSS custom properties; toggled via `[data-theme="dark"]` on `<html>`
+- **Border radius**: Cards `16px`, modals `10px`, buttons/inputs `6px`
+
+### CSS Variable Tokens
+
+| Variable | Light | Dark |
+|---|---|---|
+| `--color-primary` | `#1A237E` | `#818CF8` |
+| `--bg-card` | `#ffffff` | `#182035` |
+| `--bg-sidebar` | `#ffffff` | `#141e2e` |
+| `--bg-page` | `#F5F7F9` | `#0d1117` |
+| `--border-color` | `#DEE3EB` | `#1e3050` |
+| `--text-primary` | `#1A1C1E` | `#e2e8f0` |
+| `--text-secondary` | `#43474E` | `#7a8fa6` |
+| `--color-surface-variant` | `#F1F4F8` | `#1e3050` |
+
+---
+
 ## 📊 Dashboard Features
 
 The dashboard provides a comprehensive overview of the user's financial status.
 
-### Section 1: Summary Cards
-Four key financial metrics:
+### Section 1: Hero Summary Card
+Full-width dark navy card showing the key portfolio metrics:
 
-| Card | Description |
-|------|-------------|
-| **Income** | Total income (blue accent) |
-| **Expenses** | Total expenses as % of income (yellow accent) |
-| **Savings + Investment** | Combined amount as % of income (green accent) |
-| **Net Worth Growth** | Net worth increase vs. previous month (purple accent) |
+| Metric | Position |
+|--------|----------|
+| **Net Worth Growth** | Large hero value with +% badge |
+| **Monthly Income** | Sub-metric (bottom row) |
+| **Monthly Expenses** | Sub-metric (bottom row) |
+| **Savings + Investment** | Sub-metric (bottom row) |
+| **Savings Rate** | Sub-metric (bottom row) |
 
-### Section 2: Expense Categories
-- Expandable cards grouping expenses by app/bank
-- Subscription tracking for recurring payments
-- Itemized breakdown per category
-- **Highlight Feature**: Ability to pin/highlight specific expense items for quick identification (applies a visual indicator)
+The edit button (top-right, white icon) opens a modal to update Income, Total Savings, Total Investment, and Net Worth Growth. Expenses are calculated automatically from recorded items.
 
-### Section 3: Financial Trackers
-- **Insurance Tracker**: Monitor policies and upcoming premium payments
-- **Debt Tracker**: Track installment progress and remaining balances
+### Section 2: Expense Categories — List + Detail Panel
+Two-column layout (stacks on mobile):
+
+- **Left panel**: Category rows showing bank/app badge, item count, amount, and percentage
+- **Right panel**: Detail items for the selected category with highlight / edit / delete actions
+- Clicking a row on mobile auto-scrolls to the detail panel below
+- Empty state shows a Material Symbol icon with instruction text
+
+### Section 3: Financial Trackers (Trackers page)
+Moved to a dedicated `/trackers` route accessible from the sidebar.
+
+- **Incoming Payment (Insurance Tracker)**: Timeline layout sorted by nearest due date. Dot status: red = overdue, navy = within 7 days, gray = future. Footer shows NEXT 30 DAYS total.
+- **Recurring Payment (Debt Tracker)**: Progress bars per installment. Edit/delete appear on hover inside the white card, to the left of the `current/total` counter.
 
 ---
 
@@ -541,6 +576,59 @@ All endpoints require `Authorization: Bearer {token}` except `/api/auth/facebook
 | 401 | Unauthorized |
 | 404 | Not Found |
 | 500 | Internal Server Error |
+
+---
+
+## 🔄 UI Changelog
+
+### Dark Mode System
+- Added `--color-primary: #818CF8` override in `[data-theme="dark"]` so all navy accents become readable light indigo
+- All hardcoded `#1A237E` text/icon color uses replaced with `var(--color-primary)` across every component CSS file
+- Sidebar, top header, search input, and page background now use CSS variable tokens (`--bg-sidebar`, `--bg-header`, `--border-color`, `--color-surface-variant`, `--text-primary`)
+- Hero card and active nav item backgrounds stay hardcoded navy — they render correctly on dark backgrounds
+
+### Dashboard Redesign
+- Removed 4-card summary grid; replaced with a single full-width dark navy hero card
+- Hero card: NET WORTH GROWTH as main value, +% badge, 4 sub-metrics in a responsive grid row
+- Edit button (white SVG icon, top-right of hero card) opens `SummaryEditModal`
+- Section titles use uppercase navy micro-label style (`0.7rem`, `letter-spacing: 0.18em`)
+
+### Expense Categories Redesign
+- Replaced expandable card grid with a 2-column list + detail panel layout
+- Left panel: category rows (badge, item count, amount, %)
+- Right panel (desktop) / below (mobile): selected category items with highlight / edit / delete
+- Mobile: auto-`scrollIntoView` on category selection
+- Empty state: Material Symbol icon + "No Category Selected" instruction
+
+### Trackers Page (new)
+- Moved Insurance and Debt trackers off the Dashboard into a new `/trackers` route
+- Sidebar link changed from disabled "Transactions" → active "Trackers" with `track_changes` icon
+- Page header matches the Analytics page style (eyebrow + large title)
+
+### InsuranceTracker — Timeline Layout
+- Renamed to "Incoming Payment"
+- Sorted by nearest due date using `getDaysUntil()`
+- Timeline dots: red (overdue), navy (≤7 days), gray outline (future)
+- Date format: `APR 23, 2026` with Buddhist Era year correction
+- Footer: NEXT 30 DAYS total amount
+- Edit/delete appear on row hover (always visible on mobile)
+
+### DebtTracker — Progress Bar Actions
+- Renamed to "Recurring Payment"
+- `ProgressBar.vue` now accepts an `#actions` named slot rendered inside the white card header
+- Edit/delete buttons passed via slot — appear to the left of `current/total`, revealed on hover
+
+### Modal Redesign (all 4 modals)
+- `border-radius: 10px` (squarer containers), `6px` for inputs and buttons
+- Header separated by a bottom border divider; title `font-weight: 800`
+- Form labels: uppercase micro-labels matching the app's section title style
+- Inputs/selects: `var(--color-surface-variant)` background, `var(--border-color)` border, focus ring via `var(--color-primary)`
+- Buttons: Cancel uses card-border style; Save uses `var(--color-primary)` with `var(--color-primary-dim)` on hover
+- All Thai text translated to English throughout all modal templates
+
+### Icon System
+- Replaced emoji buttons (✏️, 🗑️, +) with Material Symbols Outlined icons (`edit`, `delete`, `add`)
+- Consistent `mat-icon` CSS class across all tracker components
 
 ---
 

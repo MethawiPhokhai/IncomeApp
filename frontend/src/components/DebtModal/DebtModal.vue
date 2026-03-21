@@ -2,23 +2,23 @@
   <div v-if="isOpen" class="debt-modal-overlay" @mousedown.self="close">
     <div class="debt-modal">
       <div class="modal-header">
-        <h2 class="modal-title">{{ isEditing ? 'แก้ไขรายการผ่อน' : 'เพิ่มรายการผ่อนใหม่' }}</h2>
+        <h2 class="modal-title">{{ isEditing ? 'Edit Installment' : 'Add Installment' }}</h2>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-form">
         <div class="form-group">
-          <label class="form-label">ชื่อรายการ</label>
-          <input 
-            v-model="form.name" 
-            type="text" 
-            class="form-input" 
+          <label class="form-label">Description</label>
+          <input
+            v-model="form.name"
+            type="text"
+            class="form-input"
             required
-            placeholder="เช่น iPhone 15 Pro, ค่าทนาย"
+            placeholder="e.g. iPhone 15 Pro, Lawyer fee"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label">ยอดผ่อนต่อเดือน (บาท)</label>
+          <label class="form-label">Monthly Payment (฿)</label>
           <input 
             v-model.number="form.monthlyPayment" 
             type="number" 
@@ -31,7 +31,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">งวดปัจจุบัน</label>
+            <label class="form-label">Current Installment</label>
             <input 
               v-model.number="form.currentInstallment" 
               type="number" 
@@ -42,7 +42,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">จำนวนงวดทั้งหมด</label>
+            <label class="form-label">Total Installments</label>
             <input 
               v-model.number="form.totalInstallments" 
               type="number" 
@@ -54,7 +54,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">ยอดคงเหลือ (บาท)</label>
+          <label class="form-label">Remaining Amount (฿)</label>
           <input 
             v-model.number="form.remainingAmount" 
             type="number" 
@@ -66,7 +66,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">ยอดรวมทั้งหมด (บาท)</label>
+          <label class="form-label">Total Amount (฿)</label>
           <input 
             v-model.number="form.totalAmount" 
             type="number" 
@@ -78,8 +78,8 @@
         </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" @click="close">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+          <button type="button" class="btn btn-secondary" @click="close">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </form>
     </div>

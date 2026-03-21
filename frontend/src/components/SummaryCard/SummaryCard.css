@@ -16,7 +16,7 @@
 
 /* Primary – navy accent */
 .summary-card--primary {
-  border-left: 4px solid #1A237E;
+  border-left: 4px solid var(--color-primary);
 }
 
 .summary-card--primary .summary-card__label {
@@ -24,7 +24,7 @@
 }
 
 .summary-card--primary .summary-card__value {
-  color: #1A237E;
+  color: var(--color-primary);
 }
 
 /* Success – green accent */

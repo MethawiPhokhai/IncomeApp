@@ -2,12 +2,12 @@
   <div v-if="isOpen" class="summary-modal-overlay" @mousedown.self="close">
     <div class="summary-modal">
       <div class="modal-header">
-        <h2 class="modal-title">แก้ไขข้อมูลสรุป</h2>
+        <h2 class="modal-title">Edit Summary</h2>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-form">
         <div class="form-group">
-          <label class="form-label">รายได้รวม (Income)</label>
+          <label class="form-label">Income</label>
           <input 
             v-model.number="form.income" 
             type="number" 
@@ -18,7 +18,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">เงินออมรวม (Total Savings)</label>
+          <label class="form-label">Total Savings</label>
           <input 
             v-model.number="form.totalSavings" 
             type="number" 
@@ -29,7 +29,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">เงินลงทุนรวม (Total Investment)</label>
+          <label class="form-label">Total Investment</label>
           <input 
             v-model.number="form.totalInvestment" 
             type="number" 
@@ -47,12 +47,12 @@
             class="form-input" 
             required
           />
-          <span class="form-node">ค่าใช้จ่ายรวม (Expenses) จะคำนวณอัตโนมัติตามรายการที่บันทึก</span>
+          <span class="form-note">Total expenses are calculated automatically from recorded items.</span>
         </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" @click="close">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+          <button type="button" class="btn btn-secondary" @click="close">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </form>
     </div>

@@ -2,23 +2,23 @@
   <div v-if="isOpen" class="expense-modal-overlay" @mousedown.self="close">
     <div class="expense-modal">
       <div class="modal-header">
-        <h2 class="modal-title">{{ isEditing ? 'แก้ไขรายการ' : 'เพิ่มรายการใหม่' }}</h2>
+        <h2 class="modal-title">{{ isEditing ? 'Edit Expense' : 'Add Expense' }}</h2>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-form">
         <div class="form-group">
-          <label class="form-label">ชื่อรายการ</label>
-          <input 
-            v-model="form.name" 
-            type="text" 
-            class="form-input" 
+          <label class="form-label">Description</label>
+          <input
+            v-model="form.name"
+            type="text"
+            class="form-input"
             required
-            placeholder="เช่น ค่าอาหาร, ค่าเดินทาง"
+            placeholder="e.g. Food, Transport, Utilities"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label">จำนวนเงิน</label>
+          <label class="form-label">Amount (฿)</label>
           <input 
             v-model.number="form.amount" 
             type="number" 
@@ -30,30 +30,30 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">ประเภท</label>
+          <label class="form-label">Type</label>
           <select v-model="form.type" class="form-select" required>
-            <option value="Fixed">ค่าใช้จ่ายคงที่ (Fixed)</option>
-            <option value="Variable">ค่าใช้จ่ายผันแปร (Variable)</option>
-            <option value="Health">สุขภาพ (Health)</option>
-            <option value="Family">ครอบครัว (Family)</option>
+            <option value="Fixed">Fixed</option>
+            <option value="Variable">Variable</option>
+            <option value="Health">Health</option>
+            <option value="Family">Family</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">แอปธนาคาร/ที่มา</label>
+          <label class="form-label">Bank / Source</label>
           <select v-model="form.bankApp" class="form-select" required>
             <option value="Kbank">Kbank</option>
             <option value="KTB">KTB</option>
             <option value="Make">Make by Kbank</option>
             <option value="Dime">Dime</option>
-            <option value="Office">Office (หักจากเงินเดือน)</option>
-            <option value="Other">อื่นๆ</option>
+            <option value="Office">Office (Salary deduction)</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" @click="close">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+          <button type="button" class="btn btn-secondary" @click="close">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </form>
     </div>

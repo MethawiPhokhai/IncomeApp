@@ -19,10 +19,10 @@
           <span class="nav-icon">analytics</span>
           <span>Analytics</span>
         </router-link>
-        <a href="#" class="nav-item disabled">
-          <span class="nav-icon">receipt_long</span>
-          <span>Transactions</span>
-        </a>
+        <router-link to="/trackers" class="nav-item" :class="{ active: route.name === 'trackers' }" @click="menuOpen = false">
+          <span class="nav-icon">track_changes</span>
+          <span>Trackers</span>
+        </router-link>
         <a href="#" class="nav-item disabled">
           <span class="nav-icon">account_balance_wallet</span>
           <span>Accounts</span>

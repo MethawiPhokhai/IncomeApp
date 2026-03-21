@@ -1,80 +1,117 @@
 <template>
   <div class="insurance-tracker">
     <div class="section-header">
-      <h3 class="section-title">ปฏิทินจ่ายประกัน</h3>
-      <button class="btn-add" @click="openAddModal" title="เพิ่มประกัน">
-        +
+      <h3 class="section-title">Incoming Payment</h3>
+      <button class="btn-add" @click="openAddModal" title="Add insurance">
+        <span class="mat-icon">add</span>
       </button>
     </div>
-    <div class="insurance-list">
-      <div 
-        v-for="insurance in insurances" 
+
+    <div class="timeline">
+      <div
+        v-for="(insurance, index) in sortedInsurances"
         :key="insurance.id"
-        class="insurance-item"
-        :class="`status-${getStatusClass(insurance.dueDate)}`"
+        class="timeline-item"
+        :class="getDotStatus(insurance.dueDate)"
       >
-        <div class="insurance-info">
-          <div class="insurance-provider">{{ insurance.provider }}</div>
-          <div class="insurance-policy">{{ insurance.policyName }}</div>
+        <!-- Dot + vertical line -->
+        <div class="timeline-track">
+          <div class="timeline-dot"></div>
+          <div v-if="index < sortedInsurances.length - 1" class="timeline-line"></div>
         </div>
-        <div class="insurance-details">
-          <div class="insurance-amount">{{ formatCurrency(insurance.premium) }}</div>
-          <div class="insurance-due">
-            <span class="due-label">ครบกำหนด:</span>
-            <span class="due-date">{{ formatShortDate(insurance.dueDate) }}</span>
-            <span class="due-days">({{ getDaysText(insurance.dueDate) }})</span>
+
+        <!-- Content -->
+        <div class="timeline-body">
+          <div class="timeline-date">{{ formatTimelineDate(insurance.dueDate) }}</div>
+          <div class="timeline-row">
+            <div class="timeline-info">
+              <div class="timeline-name">{{ insurance.provider }}</div>
+              <div class="timeline-meta">
+                <span class="timeline-amount">{{ formatCurrency(insurance.premium) }}</span>
+                <span class="meta-sep">·</span>
+                <span class="timeline-policy">{{ insurance.policyName || '—' }}</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="action-btn btn-edit" @click.stop="openEditModal(insurance)" title="Edit">
+                <span class="mat-icon">edit</span>
+              </button>
+              <button class="action-btn btn-delete" @click.stop="confirmDelete(insurance)" title="Delete">
+                <span class="mat-icon">delete</span>
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="item-actions">
-          <button class="action-btn btn-edit" @click.stop="openEditModal(insurance)" title="แก้ไข">
-            ✏️
-          </button>
-          <button class="action-btn btn-delete" @click.stop="confirmDelete(insurance)" title="ลบ">
-            🗑️
-          </button>
         </div>
       </div>
     </div>
 
-    <InsuranceModal 
-      :is-open="showModal" 
-      :edit-item="selectedItem" 
-      @close="closeModal" 
+    <!-- Footer summary -->
+    <div class="schedule-footer">
+      <div class="footer-left">
+        <span class="footer-label">NEXT 30 DAYS</span>
+        <span class="footer-amount">{{ formatCurrency(next30DaysTotal) }}</span>
+      </div>
+      <span class="mat-icon footer-icon">calendar_month</span>
+    </div>
+
+    <InsuranceModal
+      :is-open="showModal"
+      :edit-item="selectedItem"
+      @close="closeModal"
       @save="handleSave"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-// ============================================================================
-// Imports
-// ============================================================================
-import { ref } from 'vue';
-import { formatCurrency, formatShortDate, getDaysUntil } from '../../utils/formatters';
+import { ref, computed } from 'vue';
+import { formatCurrency, getDaysUntil } from '../../utils/formatters';
 import { financialService, type Insurance } from '../../services/financialService';
 import InsuranceModal from '../InsuranceModal/InsuranceModal.vue';
 
-// ============================================================================
-// Props & Emits
-// ============================================================================
 interface Props {
   insurances: Insurance[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits(['refresh']);
 
-// ============================================================================
-// Reactive State
-// ============================================================================
 const showModal = ref(false);
 const selectedItem = ref<Insurance | null>(null);
 
-// ============================================================================
-// Component Functions
-// ============================================================================
+// ── Computed ──────────────────────────────────────────────────────
+const sortedInsurances = computed(() =>
+  [...props.insurances].sort(
+    (a, b) => getDaysUntil(a.dueDate) - getDaysUntil(b.dueDate)
+  )
+);
+
+const next30DaysTotal = computed(() => {
+  return props.insurances
+    .filter(i => {
+      const d = getDaysUntil(i.dueDate);
+      return d >= 0 && d <= 30;
+    })
+    .reduce((sum, i) => sum + i.premium, 0);
+});
+
+// ── Helpers ───────────────────────────────────────────────────────
+const formatTimelineDate = (dateStr: string): string => {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const year = d.getFullYear() > 2500 ? d.getFullYear() - 543 : d.getFullYear();
+  const monthDay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+  return `${monthDay}, ${year}`;
+};
+
+const getDotStatus = (dueDate: string): string => {
+  const days = getDaysUntil(dueDate);
+  if (days < 0) return 'dot-overdue';
+  if (days <= 7) return 'dot-soon';
+  return 'dot-future';
+};
+
+// ── Actions ───────────────────────────────────────────────────────
 const openAddModal = () => {
   selectedItem.value = null;
   showModal.value = true;
@@ -92,47 +129,27 @@ const closeModal = () => {
 
 const handleSave = async (item: Insurance) => {
   try {
-    if (selectedItem.value && selectedItem.value.id) {
-      // Edit
+    if (selectedItem.value?.id) {
       await financialService.updateInsurance(selectedItem.value.id, item);
     } else {
-      // Add
       await financialService.addInsurance(item);
     }
     emit('refresh');
-  } catch (error) {
-    console.error('Failed to save insurance:', error);
-    alert('บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+  } catch {
+    alert('Failed to save. Please try again.');
   }
 };
 
 const confirmDelete = async (item: Insurance) => {
-  if (!confirm(`ต้องการลบประกัน "${item.provider} - ${item.policyName}" ใช่หรือไม่?`)) return;
-  
+  if (!confirm(`Delete "${item.provider} - ${item.policyName}"?`)) return;
   try {
     if (item.id) {
       await financialService.deleteInsurance(item.id);
       emit('refresh');
     }
-  } catch (error) {
-    console.error('Failed to delete insurance:', error);
-    alert('ลบรายการไม่สำเร็จ');
+  } catch {
+    alert('Failed to delete.');
   }
-};
-
-const getStatusClass = (dueDate: string) => {
-  const days = getDaysUntil(dueDate);
-  if (days <= 5) return 'urgent';
-  if (days <= 10) return 'warning';
-  return 'normal';
-};
-
-const getDaysText = (dueDate: string) => {
-  const days = getDaysUntil(dueDate);
-  if (days === 0) return 'วันนี้';
-  if (days === 1) return 'พรุ่งนี้';
-  if (days < 0) return `เกิน ${Math.abs(days)} วัน`;
-  return `อีก ${days} วัน`;
 };
 </script>
 

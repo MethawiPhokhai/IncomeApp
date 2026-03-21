@@ -1,35 +1,34 @@
 <template>
   <div class="debt-tracker">
     <div class="section-header">
-      <h3 class="section-title">สถานะการผ่อนจ่าย</h3>
-      <button class="btn-add" @click="openAddModal" title="เพิ่มรายการผ่อน">
-        +
+      <h3 class="section-title">Recurring Payment</h3>
+      <button class="btn-add" @click="openAddModal" title="Add installment">
+        <span class="mat-icon">add</span>
       </button>
     </div>
     <div class="debt-list">
       <div v-for="debt in debts" :key="debt.id" class="debt-item">
-        <div class="debt-content">
-          <ProgressBar
-            :label="debt.name"
-            :current="debt.currentInstallment"
-            :total="debt.totalInstallments"
-            :remaining-amount="debt.remainingAmount"
-            :color="getProgressColor(debt.currentInstallment, debt.totalInstallments)"
-          />
-          <div class="debt-footer">
-            <span class="debt-payment">{{ formatCurrency(debt.monthlyPayment) }}/เดือน</span>
-            <span class="debt-total">ทั้งหมด {{ formatCurrency(debt.totalAmount) }}</span>
-          </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="item-actions">
-          <button class="action-btn btn-edit" @click.stop="openEditModal(debt)" title="แก้ไข">
-            ✏️
-          </button>
-          <button class="action-btn btn-delete" @click.stop="confirmDelete(debt)" title="ลบ">
-            🗑️
-          </button>
+        <ProgressBar
+          :label="debt.name"
+          :current="debt.currentInstallment"
+          :total="debt.totalInstallments"
+          :remaining-amount="debt.remainingAmount"
+          :color="getProgressColor(debt.currentInstallment, debt.totalInstallments)"
+        >
+          <template #actions>
+            <div class="item-actions">
+              <button class="action-btn btn-edit" @click.stop="openEditModal(debt)" title="Edit">
+                <span class="mat-icon">edit</span>
+              </button>
+              <button class="action-btn btn-delete" @click.stop="confirmDelete(debt)" title="Delete">
+                <span class="mat-icon">delete</span>
+              </button>
+            </div>
+          </template>
+        </ProgressBar>
+        <div class="debt-footer">
+          <span class="debt-payment">{{ formatCurrency(debt.monthlyPayment) }}/mo</span>
+          <span class="debt-total">Total {{ formatCurrency(debt.totalAmount) }}</span>
         </div>
       </div>
     </div>
@@ -99,12 +98,12 @@ const handleSave = async (item: Debt) => {
     emit('refresh');
   } catch (error) {
     console.error('Failed to save debt:', error);
-    alert('บันทึกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+    alert('Failed to save. Please try again.');
   }
 };
 
 const confirmDelete = async (item: Debt) => {
-  if (!confirm(`ต้องการลบรายการผ่อน "${item.name}" ใช่หรือไม่?`)) return;
+  if (!confirm(`Delete installment "${item.name}"?`)) return;
   
   try {
     if (item.id) {
@@ -113,7 +112,7 @@ const confirmDelete = async (item: Debt) => {
     }
   } catch (error) {
     console.error('Failed to delete debt:', error);
-    alert('ลบรายการไม่สำเร็จ');
+    alert('Failed to delete.');
   }
 };
 

@@ -2,34 +2,34 @@
   <div v-if="isOpen" class="insurance-modal-overlay" @mousedown.self="close">
     <div class="insurance-modal">
       <div class="modal-header">
-        <h2 class="modal-title">{{ isEditing ? 'แก้ไขประกัน' : 'เพิ่มประกันใหม่' }}</h2>
+        <h2 class="modal-title">{{ isEditing ? 'Edit Insurance' : 'Add Insurance' }}</h2>
       </div>
       
       <form @submit.prevent="handleSubmit" class="modal-form">
         <div class="form-group">
-          <label class="form-label">บริษัทประกัน</label>
-          <input 
-            v-model="form.provider" 
-            type="text" 
-            class="form-input" 
+          <label class="form-label">Provider</label>
+          <input
+            v-model="form.provider"
+            type="text"
+            class="form-input"
             required
-            placeholder="เช่น AIA, FWD, Rabbit"
+            placeholder="e.g. AIA, FWD, Rabbit"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label">ชื่อกรมธรรม์</label>
-          <input 
-            v-model="form.policyName" 
-            type="text" 
-            class="form-input" 
+          <label class="form-label">Policy Name</label>
+          <input
+            v-model="form.policyName"
+            type="text"
+            class="form-input"
             required
-            placeholder="เช่น แผนชีวิต, สุขภาพ"
+            placeholder="e.g. Life Plan, Health"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label">เบี้ยประกัน (บาท)</label>
+          <label class="form-label">Premium (฿)</label>
           <input 
             v-model.number="form.premium" 
             type="number" 
@@ -41,7 +41,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">วันครบกำหนด</label>
+          <label class="form-label">Due Date</label>
           <input 
             v-model="form.dueDate" 
             type="date" 
@@ -51,17 +51,17 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">สถานะ</label>
+          <label class="form-label">Status</label>
           <select v-model="form.status" class="form-select" required>
-            <option value="Upcoming">กำลังจะถึง (Upcoming)</option>
-            <option value="Paid">จ่ายแล้ว (Paid)</option>
-            <option value="Overdue">เกินกำหนด (Overdue)</option>
+            <option value="Upcoming">Upcoming</option>
+            <option value="Paid">Paid</option>
+            <option value="Overdue">Overdue</option>
           </select>
         </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" @click="close">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+          <button type="button" class="btn btn-secondary" @click="close">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </form>
     </div>
@@ -127,11 +127,26 @@ const handleSubmit = () => {
 // ============================================================================
 // Watchers
 // ============================================================================
+const toDateInputValue = (dateStr: string): string => {
+  if (!dateStr) return '';
+  // Take only the date part from ISO strings like "2024-03-17T00:00:00"
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr.split('T')[0] ?? '';
+  // Handle Buddhist Era years
+  const year = d.getFullYear() > 2500 ? d.getFullYear() - 543 : d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${year}-${mm}-${dd}`;
+};
+
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     if (props.editItem) {
       isEditing.value = true;
-      form.value = { ...props.editItem };
+      form.value = {
+        ...props.editItem,
+        dueDate: toDateInputValue(props.editItem.dueDate)
+      };
     } else {
       isEditing.value = false;
       resetForm();

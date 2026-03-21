@@ -2,7 +2,10 @@
   <div class="progress-bar">
     <div class="progress-bar__header">
       <span class="progress-bar__label">{{ label }}</span>
-      <span class="progress-bar__value">{{ current }}/{{ total }}</span>
+      <div class="progress-bar__header-right">
+        <slot name="actions" />
+        <span class="progress-bar__value">{{ current }}/{{ total }}</span>
+      </div>
     </div>
     <div class="progress-bar__track">
       <div 
@@ -11,8 +14,8 @@
       ></div>
     </div>
     <div class="progress-bar__info">
-      <span>{{ percentage.toFixed(0) }}% เสร็จสิ้น</span>
-      <span v-if="remainingAmount">เหลือ {{ formatCurrency(remainingAmount) }}</span>
+      <span>{{ percentage.toFixed(0) }}% complete</span>
+      <span v-if="remainingAmount">Remaining {{ formatCurrency(remainingAmount) }}</span>
     </div>
   </div>
 </template>

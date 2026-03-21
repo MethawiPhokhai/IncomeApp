@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login/Login.vue'
 import Dashboard from '../views/Dashboard/Dashboard.vue'
 import Analytics from '../views/Analytics/Analytics.vue'
+import Trackers from '../views/Trackers/Trackers.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,12 @@ const router = createRouter({
             path: '/analytics',
             name: 'analytics',
             component: Analytics,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/trackers',
+            name: 'trackers',
+            component: Trackers,
             meta: { requiresAuth: true }
         }
     ]
