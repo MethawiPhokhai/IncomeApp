@@ -1,6 +1,6 @@
 # IncomeApp
 
-A modern full-stack personal finance tracker built with Vue.js and .NET 10, using Vertical Slice Architecture and Facebook OAuth for authentication.
+A modern full-stack personal expense management app built with Vue.js and .NET 10, using Vertical Slice Architecture and Facebook OAuth for authentication. Features an institutional-grade UI with a fixed sidebar, dark mode, and a fully responsive layout.
 
 ## 🛠️ Tech Stack
 
@@ -9,8 +9,8 @@ A modern full-stack personal finance tracker built with Vue.js and .NET 10, usin
 - Vite 7.x
 - Vue Router 4.x
 - TanStack Query (Vue Query) for server state management
-- Chart.js (via vue-chartjs)
-- CSS Custom Properties
+- CSS Custom Properties (no CSS framework — custom design system)
+- Material Symbols Outlined (Google Fonts icons)
 
 ### Backend
 - .NET 10 Web API (Minimal APIs)
@@ -51,6 +51,7 @@ IncomeApp/
 ├── frontend/                           # Vue.js + Vite Frontend
 │   ├── src/
 │   │   ├── components/                 # Reusable Vue components
+│   │   │   ├── AppLayout/              # Shared layout: fixed sidebar + sticky top header
 │   │   │   ├── AppExpenseSummary/      # Expense summary with expandable cards
 │   │   │   ├── CategoryBreakdown/      # Category display component
 │   │   │   ├── DebtModal/              # Modal for debt CRUD
@@ -62,12 +63,7 @@ IncomeApp/
 │   │   │   ├── SubscriptionTracker/    # Subscription tracking component
 │   │   │   ├── SummaryCard/            # Summary card for dashboard
 │   │   │   ├── SummaryEditModal/       # Modal for editing summary stats
-│   │   │   ├── ThemeToggle/            # Dark/light theme toggle
-│   │   │   └── charts/                 # Chart components
-│   │   │       ├── BarChart/
-│   │   │       ├── DonutChart/
-│   │   │       ├── GaugeChart/
-│   │   │       └── PieChart/
+│   │   │   └── ThemeToggle/            # Dark/light theme toggle (Material Symbols icons)
 │   │   ├── composables/
 │   │   │   ├── useTheme.ts             # Theme management composable
 │   │   │   └── useCrud.ts              # TanStack Query composables for CRUD
@@ -79,6 +75,9 @@ IncomeApp/
 │   │   ├── utils/
 │   │   │   └── formatters.ts           # Number and date formatters
 │   │   ├── views/
+│   │   │   ├── Analytics/
+│   │   │   │   ├── Analytics.vue       # Bento-grid analytics page (SVG donut, subscriptions table)
+│   │   │   │   └── Analytics.css
 │   │   │   ├── Dashboard/
 │   │   │   │   ├── Dashboard.vue
 │   │   │   │   └── Dashboard.css
@@ -87,7 +86,7 @@ IncomeApp/
 │   │   │       └── Login.css
 │   │   ├── App.vue
 │   │   ├── main.ts
-│   │   ├── style.css                   # Global styles & design system
+│   │   ├── style.css                   # Global styles & design system (light + dark mode tokens)
 │   │   └── vue-shim.d.ts
 │   ├── .env                            # VITE_FACEBOOK_APP_ID
 │   ├── .env.production
@@ -259,24 +258,40 @@ Four key financial metrics:
 
 | Card | Description |
 |------|-------------|
-| **Income** 💰 | Total income (blue accent) |
-| **Expenses** 💸 | Total expenses as % of income (yellow accent) |
-| **Savings + Investment** 🎯 | Combined amount as % of income (green accent) |
-| **Net Worth Growth** 📈 | Net worth increase vs. previous month (purple accent) |
+| **Income** | Total income (blue accent) |
+| **Expenses** | Total expenses as % of income (yellow accent) |
+| **Savings + Investment** | Combined amount as % of income (green accent) |
+| **Net Worth Growth** | Net worth increase vs. previous month (purple accent) |
 
-### Section 2: Financial Charts
-- **Expense Summary by App**: Pie chart showing expense distribution across apps/banks
-- **Top 5 Expenses**: Bar chart of the highest expense categories
-
-### Section 3: Expense Categories
+### Section 2: Expense Categories
 - Expandable cards grouping expenses by app/bank
 - Subscription tracking for recurring payments
 - Itemized breakdown per category
 - **Highlight Feature**: Ability to pin/highlight specific expense items for quick identification (applies a visual indicator)
 
-### Section 4: Financial Trackers
+### Section 3: Financial Trackers
 - **Insurance Tracker**: Monitor policies and upcoming premium payments
 - **Debt Tracker**: Track installment progress and remaining balances
+
+---
+
+## 📈 Analytics Page
+
+The Analytics page uses a **bento-grid layout** with data from the same `/api/financial/dashboard` endpoint (served from TanStack Query cache — no extra API call).
+
+### Bento Top Row (3 cards)
+| Card | Description |
+|------|-------------|
+| **Efficiency Score** | Savings rate as a 0–100 score with progress bar |
+| **Monthly Savings** | Dime account savings amount and rate |
+| **Subscription Alert** | Largest upcoming subscription cost |
+
+### Bento Middle Row (2 cards)
+- **Expense Breakdown**: SVG donut chart (no Chart.js) with legend showing distribution across banks/apps
+- **Top Expenses**: Horizontal progress bars ranking the highest expense categories
+
+### Activity Table
+Full subscription list with columns: Name, Next Billing, Cycle, Amount, Bank. Subscriptions are hardcoded in `FinancialService.cs` and include services such as Netflix, YouTube Premium, Google Drive, Claude, and others.
 
 ---
 
