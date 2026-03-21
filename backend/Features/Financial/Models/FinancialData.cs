@@ -64,8 +64,8 @@ public class Debt
     public decimal MonthlyPayment { get; set; }
     public int CurrentInstallment { get; set; }
     public int TotalInstallments { get; set; }
-    public decimal RemainingAmount { get; set; }
-    public decimal TotalAmount { get; set; }
+    public decimal TotalAmount => MonthlyPayment * TotalInstallments;
+    public decimal RemainingAmount => MonthlyPayment * (TotalInstallments - CurrentInstallment);
 }
 
 public class ChartData

@@ -12,7 +12,7 @@
           :label="debt.name"
           :current="debt.currentInstallment"
           :total="debt.totalInstallments"
-          :remaining-amount="debt.remainingAmount"
+          :remaining-amount="debt.monthlyPayment * (debt.totalInstallments - debt.currentInstallment)"
           :color="getProgressColor(debt.currentInstallment, debt.totalInstallments)"
         >
           <template #actions>

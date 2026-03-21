@@ -53,28 +53,16 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Remaining Amount (฿)</label>
-          <input 
-            v-model.number="form.remainingAmount" 
-            type="number" 
-            class="form-input" 
-            required
-            min="0"
-            step="0.01"
-          />
-        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Total Amount (฿)</label>
+            <div class="form-input form-input--readonly">{{ totalAmount.toLocaleString() }}</div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Total Amount (฿)</label>
-          <input 
-            v-model.number="form.totalAmount" 
-            type="number" 
-            class="form-input" 
-            required
-            min="0"
-            step="0.01"
-          />
+          <div class="form-group">
+            <label class="form-label">Remaining Amount (฿)</label>
+            <div class="form-input form-input--readonly">{{ remainingAmount.toLocaleString() }}</div>
+          </div>
         </div>
 
         <div class="modal-actions">
@@ -90,7 +78,7 @@
 // ============================================================================
 // Imports
 // ============================================================================
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Debt } from '../../services/financialService';
 
 // ============================================================================
@@ -108,14 +96,15 @@ const emit = defineEmits(['close', 'save']);
 // ============================================================================
 const isEditing = ref(false);
 
-const form = ref<Debt>({
+const form = ref<Omit<Debt, 'remainingAmount' | 'totalAmount'>>({
   name: '',
   monthlyPayment: 0,
   currentInstallment: 0,
   totalInstallments: 1,
-  remainingAmount: 0,
-  totalAmount: 0
 });
+
+const totalAmount = computed(() => form.value.monthlyPayment * form.value.totalInstallments);
+const remainingAmount = computed(() => totalAmount.value - form.value.monthlyPayment * form.value.currentInstallment);
 
 // ============================================================================
 // Component Functions
@@ -126,8 +115,6 @@ const resetForm = () => {
     monthlyPayment: 0,
     currentInstallment: 0,
     totalInstallments: 1,
-    remainingAmount: 0,
-    totalAmount: 0
   };
 };
 
@@ -136,7 +123,7 @@ const close = () => {
 };
 
 const handleSubmit = () => {
-  emit('save', { ...form.value });
+  emit('save', { ...form.value, totalAmount: totalAmount.value, remainingAmount: remainingAmount.value });
   close();
 };
 
@@ -147,7 +134,8 @@ watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     if (props.editItem) {
       isEditing.value = true;
-      form.value = { ...props.editItem };
+      const { remainingAmount: _r, totalAmount: _t, ...rest } = props.editItem;
+      form.value = rest;
     } else {
       isEditing.value = false;
       resetForm();

@@ -558,11 +558,13 @@ All endpoints require `Authorization: Bearer {token}` except `/api/auth/facebook
   "name": "iPhone 15 Pro",
   "monthlyPayment": 1500,
   "currentInstallment": 1,
-  "totalInstallments": 12,
-  "remainingAmount": 18000,
-  "totalAmount": 18000
+  "totalInstallments": 12
 }
 ```
+
+> `totalAmount` and `remainingAmount` are computed values — not stored in the database and not accepted as input.
+> `totalAmount = monthlyPayment × totalInstallments`
+> `remainingAmount = monthlyPayment × (totalInstallments − currentInstallment)`
 
 ---
 
@@ -617,6 +619,14 @@ All endpoints require `Authorization: Bearer {token}` except `/api/auth/facebook
 - Renamed to "Recurring Payment"
 - `ProgressBar.vue` now accepts an `#actions` named slot rendered inside the white card header
 - Edit/delete buttons passed via slot — appear to the left of `current/total`, revealed on hover
+
+### DebtModal — Auto-calculated Fields
+- `Remaining Amount` and `Total Amount` inputs removed from the Add/Edit Installment modal
+- Values are now computed live and displayed as read-only:
+  - `totalAmount = monthlyPayment × totalInstallments`
+  - `remainingAmount = monthlyPayment × (totalInstallments − currentInstallment)`
+- Corresponding columns (`remaining_amount`, `total_amount`) dropped from the `debts` table in Supabase (migration: `04_remove_computed_debt_columns.sql`)
+- Backend `Debt` DTO exposes these as computed properties; `DebtEntity` no longer maps these columns
 
 ### Modal Redesign (all 4 modals)
 - `border-radius: 10px` (squarer containers), `6px` for inputs and buttons

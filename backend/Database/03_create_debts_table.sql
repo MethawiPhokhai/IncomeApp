@@ -6,8 +6,6 @@ CREATE TABLE IF NOT EXISTS debts (
     monthly_payment DECIMAL(10, 2) NOT NULL,
     current_installment INT NOT NULL,
     total_installments INT NOT NULL,
-    remaining_amount DECIMAL(10, 2) NOT NULL,
-    total_amount DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

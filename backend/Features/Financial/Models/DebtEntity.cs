@@ -24,12 +24,6 @@ public class DebtEntity : BaseModel
     [Column("total_installments")]
     public int TotalInstallments { get; set; }
 
-    [Column("remaining_amount")]
-    public decimal RemainingAmount { get; set; }
-
-    [Column("total_amount")]
-    public decimal TotalAmount { get; set; }
-
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
 

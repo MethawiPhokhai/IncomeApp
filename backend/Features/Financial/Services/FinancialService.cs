@@ -339,8 +339,6 @@ public class FinancialService : IFinancialService
             MonthlyPayment = debt.MonthlyPayment,
             CurrentInstallment = debt.CurrentInstallment,
             TotalInstallments = debt.TotalInstallments,
-            RemainingAmount = debt.RemainingAmount,
-            TotalAmount = debt.TotalAmount,
             CreatedAt = now,
             UpdatedAt = now
         };
@@ -356,8 +354,6 @@ public class FinancialService : IFinancialService
             MonthlyPayment = newDebt.MonthlyPayment,
             CurrentInstallment = newDebt.CurrentInstallment,
             TotalInstallments = newDebt.TotalInstallments,
-            RemainingAmount = newDebt.RemainingAmount,
-            TotalAmount = newDebt.TotalAmount
         };
     }
 
@@ -381,8 +377,6 @@ public class FinancialService : IFinancialService
         existing.MonthlyPayment = debt.MonthlyPayment;
         existing.CurrentInstallment = debt.CurrentInstallment;
         existing.TotalInstallments = debt.TotalInstallments;
-        existing.RemainingAmount = debt.RemainingAmount;
-        existing.TotalAmount = debt.TotalAmount;
         existing.UpdatedAt = DateTime.UtcNow;
         
         await _supabase
@@ -396,8 +390,6 @@ public class FinancialService : IFinancialService
             MonthlyPayment = existing.MonthlyPayment,
             CurrentInstallment = existing.CurrentInstallment,
             TotalInstallments = existing.TotalInstallments,
-            RemainingAmount = existing.RemainingAmount,
-            TotalAmount = existing.TotalAmount
         };
     }
 
@@ -603,8 +595,6 @@ public class FinancialService : IFinancialService
                 MonthlyPayment = d.MonthlyPayment,
                 CurrentInstallment = d.CurrentInstallment,
                 TotalInstallments = d.TotalInstallments,
-                RemainingAmount = d.RemainingAmount,
-                TotalAmount = d.TotalAmount
             })
             .ToList();
     }

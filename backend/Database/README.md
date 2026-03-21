@@ -57,6 +57,7 @@ Run the table creation scripts in your Supabase SQL Editor in the following orde
 01_create_expenses_table.sql             -- Expense tracking
 02_create_insurances_table.sql           -- Insurance policies
 03_create_debts_table.sql                -- Debt/installments
+04_remove_computed_debt_columns.sql      -- Drop remaining_amount & total_amount (computed, not stored)
 ```
 
 These scripts will:
@@ -146,10 +147,12 @@ insert_debts.sql
 | monthly_payment | DECIMAL(10,2) | Monthly installment amount |
 | current_installment | INT | Current installment number |
 | total_installments | INT | Total number of installments |
-| remaining_amount | DECIMAL(10,2) | Remaining balance |
-| total_amount | DECIMAL(10,2) | Total debt amount |
 | created_at | TIMESTAMP | Creation timestamp |
 | updated_at | TIMESTAMP | Last update timestamp |
+
+> `remaining_amount` and `total_amount` are not stored — computed at runtime:
+> `total_amount = monthly_payment × total_installments`
+> `remaining_amount = monthly_payment × (total_installments − current_installment)`
 
 ## Row Level Security (RLS)
 
